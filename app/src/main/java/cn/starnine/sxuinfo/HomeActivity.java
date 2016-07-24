@@ -89,7 +89,7 @@ public class HomeActivity extends AppCompatActivity implements Response.ErrorLis
 
     @Override
     public void onResponse(final String s) {
-        if(dialog!=null)dialog.cancel();
+
         new Thread(){
             public void run(){
                 SXUInfo sxuinfo=new SXUInfo();
@@ -182,6 +182,7 @@ public class HomeActivity extends AppCompatActivity implements Response.ErrorLis
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
+                    if(dialog!=null)dialog.cancel();
                     SXUInfo sxuinfo=(SXUInfo)msg.obj;
                     tv_last_ip.setText(sxuinfo.getLastip());
                     tv_name.setText(sxuinfo.getName());
@@ -191,6 +192,7 @@ public class HomeActivity extends AppCompatActivity implements Response.ErrorLis
                     toast(sxuinfo.infos.get(0).get(0).getTitle()+sxuinfo.infos.get(0).get(0).getHref());
                     break;
                 case 2:
+                    if(dialog!=null)dialog.cancel();
                     toast("身份过期");
                     finish();
                     startActivity(new Intent(HomeActivity.this,LoginActivity.class));
