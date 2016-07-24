@@ -7,6 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/colorBackground"
     tools:context="cn.starnine.sxuinfo.MainActivity">
 
 
@@ -21,13 +22,15 @@
             android:layout_height="wrap_content"
             android:text="登录"
             android:id="@+id/btn_login"
+            android:background="@android:drawable/btn_default"
             android:layout_gravity="center_horizontal" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/button2"
+            android:text="主界面"
+            android:id="@+id/btn_main"
+            android:background="@android:drawable/btn_default"
             android:layout_gravity="center_horizontal" />
     </LinearLayout>
 </RelativeLayout>

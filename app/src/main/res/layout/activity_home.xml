@@ -7,38 +7,49 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/colorBackground"
-    tools:context="cn.starnine.sxuinfo.LoginActivity">
+    tools:context="cn.starnine.sxuinfo.HomeActivity">
+
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_vertical"
         >
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/login_font"
-            android:drawableLeft="@drawable/login_icon_account"
-            android:hint="@string/username"
 
-            android:id="@+id/et_username" />
-        <EditText
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/login_font"
 
-            android:drawableLeft="@drawable/login_icon_password"
-            android:inputType="textPassword"
-            android:hint="@string/passwd"
-            android:id="@+id/et_passwd" />
-        <Button
+            android:text="姓名："
+            android:textSize="@dimen/login_font"
+            android:id="@+id/tv_name" />
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:text="@string/login"
-            android:background="@android:drawable/btn_default"
-            android:id="@+id/btn_login" />
+
+            android:text="部门："
+            android:textSize="@dimen/login_font"
+            android:id="@+id/tv_depart" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="上次登录时间："
+            android:textSize="@dimen/login_font"
+            android:id="@+id/tv_last_time" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="上次登录IP："
+            android:textSize="@dimen/login_font"
+            android:id="@+id/tv_last_ip" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="照片："
+            android:textSize="@dimen/login_font"
+            android:id="@+id/tv_photo" />
+
     </LinearLayout>
-
 </RelativeLayout>
