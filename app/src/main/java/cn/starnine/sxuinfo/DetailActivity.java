@@ -8,6 +8,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +24,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DetailActivity extends AppCompatActivity implements Response.ErrorListener,Response.Listener<String>{
@@ -45,12 +52,14 @@ private TextView tv_head;
         }
         initView();
     }
-
+private ListView lv_list;
     private void initView() {
         setTitle(title);
-
+lv_list=(ListView)findViewById(R.id.lv_list);
         tv_context=(TextView)findViewById(R.id.tv_context);
         tv_head=(TextView)findViewById(R.id.tv_head);
+        TextView tv=(TextView)findViewById(R.id.tv_title);
+        tv.setText(title);
         dialog=new ProgressDialog(this);
         dialog.setMessage("加载中");
         dialog.show();
@@ -58,13 +67,17 @@ private TextView tv_head;
 
         String url=href;
 
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 url, this,this){
+
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String,String> localHashMap =new HashMap<>();
                 localHashMap.put("User-Agent", "Mozilla/4.0 (compatibl; MSIE 5.5; Windows NT)");
                 localHashMap.put("Cookie",sp.getString("cookie",""));
+                Log.v("A",getUrl());
                 return localHashMap;
             }
         };
@@ -99,11 +112,34 @@ private TextView tv_head;
                     article=(Analysis.Article)msg.obj;
                     tv_head.setText(article.header);
                     tv_context.setText(article.body);
+                    if(dialog!=null)dialog.cancel();
+                    lv_list.setAdapter(new SimpleAdapter(DetailActivity.this,getData(),R.layout.lv_detail,new String[]{"name"},new int[]{R.id.tv_name}));
+lv_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+    }
+});
+                    break;
+                case 2:
+                    tv_context.setText(msg.obj.toString());
+                    if(dialog!=null)dialog.cancel();
                     break;
             }
         }
     };
-   private  Analysis.Article article;
+
+    private List<HashMap<String,String>> getData() {
+        List<HashMap<String,String>> list=new ArrayList<>();
+        for(Analysis.Article.Adder a:article.adder){
+            HashMap<String,String> map=new HashMap<>();
+            map.put("name",a.name);
+            list.add(map);
+        }
+        return  list;
+    }
+
+    private  Analysis.Article article;
     @Override
     public void onResponse(final String s) {
         new Thread(){
@@ -113,6 +149,7 @@ private TextView tv_head;
                 msg.what=1;
                 msg.obj=article;
                 handler.sendMessage(msg);
+
             }
         }.start();
     }

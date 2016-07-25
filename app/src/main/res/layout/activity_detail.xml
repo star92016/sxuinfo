@@ -8,17 +8,22 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="cn.starnine.sxuinfo.DetailActivity">
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        >
 
 
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="head"
+            android:textSize="@dimen/login_font"
+            android:paddingBottom="20dp"
+            android:id="@+id/tv_title" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,6 +36,12 @@
             android:textSize="@dimen/login_font"
             android:text="context"
             android:id="@+id/tv_context" />
+        <ListView
+            android:paddingTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lv_list"
+            />
     </LinearLayout>
-    </ScrollView>
+</ScrollView>
 </RelativeLayout>

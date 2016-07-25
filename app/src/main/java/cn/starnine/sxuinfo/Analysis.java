@@ -331,6 +331,13 @@ public class Analysis {
             for(Adder a:adder){
                 a.href="http://myportal.sxu.edu.cn/"+a.href;
             }
+            body=body.replaceAll("&nbsp;","");
+            body=body.replaceAll("&apos;","'");
+            body=body.replaceAll("&quot;","\"");
+            body=body.replaceAll("&gt;",">");
+            body=body.replaceAll("&lt;","<");
+            body=body.replaceAll("&ldquo;","“");
+            body=body.replaceAll("&rdquo;","”");
         }
         public class Adder{
             public String name="";

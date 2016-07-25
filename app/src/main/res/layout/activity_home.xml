@@ -51,5 +51,20 @@
             android:textSize="@dimen/login_font"
             android:id="@+id/tv_photo" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/iv_photo"
+            android:src="@drawable/login_icon_account"
+             />
+        <ExpandableListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/elv_list"/>
+
+
+
     </LinearLayout>
+
 </RelativeLayout>

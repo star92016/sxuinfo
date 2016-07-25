@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Message msg=new Message();
                     msg.what=1;
                     msg.obj=rawCookies==null?"":rawCookies;
-                    handler.sendMessageDelayed(msg,5000);
+                    handler.sendMessage(msg);
                     String dataString = new String(response.data, "UTF-8");
                     return Response.success(dataString, HttpHeaderParser.parseCacheHeaders(response));
                 } catch (UnsupportedEncodingException e) {
@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         edit.putString("user",et_user.getText().toString().trim());
                         edit.putString("pass",et_passwd.getText().toString().trim());
                         edit.putString("cookie",msg.obj.toString());
-                        edit.commit();
+                        edit.apply();
                         finish();
                     }
                     break;
