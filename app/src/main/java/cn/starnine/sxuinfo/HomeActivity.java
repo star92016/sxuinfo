@@ -64,7 +64,7 @@ public class HomeActivity extends AppCompatActivity implements Response.ErrorLis
         tv_photo=(TextView)findViewById(R.id.tv_photo);
 iv_photo=(ImageView)findViewById(R.id.iv_photo);
         elv_list=(ExpandableListView)findViewById(R.id.elv_list);
-        setTitle("主界面");
+
         dialog=new ProgressDialog(this);
         dialog.setMessage("加载中");
         dialog.show();
