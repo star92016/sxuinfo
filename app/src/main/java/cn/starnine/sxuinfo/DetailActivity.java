@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -24,7 +25,8 @@ import java.util.Map;
 public class DetailActivity extends AppCompatActivity implements Response.ErrorListener,Response.Listener<String>{
     private String title,href;
     private SharedPreferences sp;
-
+private TextView tv_head;
+    private TextView tv_context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +48,9 @@ public class DetailActivity extends AppCompatActivity implements Response.ErrorL
 
     private void initView() {
         setTitle(title);
+
+        tv_context=(TextView)findViewById(R.id.tv_context);
+        tv_head=(TextView)findViewById(R.id.tv_head);
         dialog=new ProgressDialog(this);
         dialog.setMessage("加载中");
         dialog.show();
@@ -90,51 +95,26 @@ public class DetailActivity extends AppCompatActivity implements Response.ErrorL
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
+                case 1:
+                    article=(Analysis.Article)msg.obj;
+                    tv_head.setText(article.header);
+                    tv_context.setText(article.body);
+                    break;
             }
         }
     };
+   private  Analysis.Article article;
     @Override
     public void onResponse(final String s) {
         new Thread(){
             public void run(){
-
+                Analysis.Article article= new Analysis(s).parser();
+                Message msg=new Message();
+                msg.what=1;
+                msg.obj=article;
+                handler.sendMessage(msg);
             }
         }.start();
     }
-    private Stirng analysis(final String s){
-        String str=s;
-        str=s.substring(s.indexOf("<body"));
-        str=str.substring(str.indexOf("<body",10)>0?str.indexOf("<body",10):0);
-        String val="";
 
-        return null;
-    }
-
-    class Content{
-        private String header,container,adder;
-
-        public String getHeader() {
-            return header;
-        }
-
-        public void setHeader(String header) {
-            this.header = header;
-        }
-
-        public String getContainer() {
-            return container;
-        }
-
-        public void setContainer(String container) {
-            this.container = container;
-        }
-
-        public String getAdder() {
-            return adder;
-        }
-
-        public void setAdder(String adder) {
-            this.adder = adder;
-        }
-    }
 }
