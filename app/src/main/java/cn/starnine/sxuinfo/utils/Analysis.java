@@ -1,4 +1,4 @@
-package cn.starnine.sxuinfo;
+package cn.starnine.sxuinfo.utils;
 
 
 

@@ -29,129 +29,132 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DetailActivity extends AppCompatActivity implements Response.ErrorListener,Response.Listener<String>{
-    private String title,href;
+import cn.starnine.sxuinfo.utils.Analysis;
+import cn.starnine.sxuinfo.utils.MyStringRequest;
+
+public class DetailActivity extends BaseActivity implements MyStringRequest.MyResponse {
+    private String title, href;
     private SharedPreferences sp;
-private TextView tv_head;
+    private TextView tv_head;
     private TextView tv_context;
+    private RequestQueue queue;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-        title=getIntent().getStringExtra("title");
-        href=getIntent().getStringExtra("href");
-        if(title==null||title.equals("")||href==null||href.equals("")){
+    public void beforeSetView() {
+        title = getIntent().getStringExtra("title");
+        href = getIntent().getStringExtra("href");
+        if (title == null || title.equals("") || href == null || href.equals("")) {
             finish();
             return;
         }
-        sp =getSharedPreferences("config", Context.MODE_PRIVATE);
-        if(sp.getString("cookie","").equals("")){
+        sp = getSharedPreferences("config", Context.MODE_PRIVATE);
+        if (sp.getString("cookie", "").equals("")) {
             finish();
-            startActivity(new Intent(this,LoginActivity.class));
             return;
         }
-        initView();
     }
-private ListView lv_list;
-    private void initView() {
+
+    @Override
+    public void setContentView() {
+        setContentView(R.layout.activity_detail);
+    }
+
+    private ListView lv_list;
+
+    public void initView() {
         setTitle(title);
-lv_list=(ListView)findViewById(R.id.lv_list);
-        tv_context=(TextView)findViewById(R.id.tv_context);
-        tv_head=(TextView)findViewById(R.id.tv_head);
-        TextView tv=(TextView)findViewById(R.id.tv_title);
+        lv_list = (ListView) findViewById(R.id.lv_list);
+        tv_context = (TextView) findViewById(R.id.tv_context);
+        tv_head = (TextView) findViewById(R.id.tv_head);
+        TextView tv = (TextView) findViewById(R.id.tv_title);
         tv.setText(title);
-        dialog=new ProgressDialog(this);
+        dialog = new ProgressDialog(this);
         dialog.setMessage("加载中");
         dialog.show();
-        RequestQueue queue= Volley.newRequestQueue(this);
+        queue = Volley.newRequestQueue(this);
+        queue.add(new MyStringRequest(href, this));
 
-        String url=href;
-
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                url, this,this){
-
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String,String> localHashMap =new HashMap<>();
-                localHashMap.put("User-Agent", "Mozilla/4.0 (compatibl; MSIE 5.5; Windows NT)");
-                localHashMap.put("Cookie",sp.getString("cookie",""));
-                Log.v("A",getUrl());
-                return localHashMap;
-            }
-        };
-        queue.add(stringRequest);
     }
 
-    private Toast toast;
-    public void toast(String str){
-
-        if(toast==null) {
-            toast = Toast.makeText(this,str,Toast.LENGTH_SHORT);
-        }
-        else
-            toast.setText(str);
-        toast.show();
-    }
     private ProgressDialog dialog;
+
     @Override
     public void onErrorResponse(VolleyError volleyError) {
-
-        if(dialog!=null)dialog.cancel();
+        if (dialog != null) dialog.cancel();
         toast("网络错误或身份过期");
         finish();
-        startActivity(new Intent(this,LoginActivity.class));
+        //startActivity(new Intent(this, LoginActivity.class));
     }
-    private Handler handler=new Handler(){
+
+    private Handler handler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case 1:
-                    article=(Analysis.Article)msg.obj;
+                    article = (Analysis.Article) msg.obj;
                     tv_head.setText(article.header);
                     tv_context.setText(article.body);
-                    if(dialog!=null)dialog.cancel();
-                    lv_list.setAdapter(new SimpleAdapter(DetailActivity.this,getData(),R.layout.lv_detail,new String[]{"name"},new int[]{R.id.tv_name}));
-lv_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (dialog != null) dialog.cancel();
+                    lv_list.setAdapter(new SimpleAdapter(DetailActivity.this, getData(), R.layout.lv_detail, new String[]{"name"}, new int[]{R.id.tv_name}));
+                    lv_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-    }
-});
+                        }
+                    });
                     break;
                 case 2:
                     tv_context.setText(msg.obj.toString());
-                    if(dialog!=null)dialog.cancel();
+                    if (dialog != null) dialog.cancel();
                     break;
             }
         }
     };
 
-    private List<HashMap<String,String>> getData() {
-        List<HashMap<String,String>> list=new ArrayList<>();
-        for(Analysis.Article.Adder a:article.adder){
-            HashMap<String,String> map=new HashMap<>();
-            map.put("name",a.name);
+    private List<HashMap<String, String>> getData() {
+        List<HashMap<String, String>> list = new ArrayList<>();
+        for (Analysis.Article.Adder a : article.adder) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("name", a.name);
             list.add(map);
         }
-        return  list;
+        return list;
     }
 
-    private  Analysis.Article article;
+    private Analysis.Article article;
+
     @Override
     public void onResponse(final String s) {
-        new Thread(){
-            public void run(){
-                Analysis.Article article= new Analysis(s).parser();
-                Message msg=new Message();
-                msg.what=1;
-                msg.obj=article;
+        new Thread() {
+            public void run() {
+                Analysis.Article article = new Analysis(s).parser();
+                Message msg = new Message();
+                msg.what = 1;
+                msg.obj = article;
                 handler.sendMessage(msg);
 
             }
         }.start();
     }
 
+    @Override
+    public void onGetCookie(String cookie) {
+
+    }
+
+    @Override
+    public String onSetCookie() {
+        return sp.getString("cookie", "");
+    }
+
+    @Override
+    public Map<String, String> getParams() {
+        return null;
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
 }
