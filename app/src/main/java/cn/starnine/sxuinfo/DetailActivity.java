@@ -2,34 +2,22 @@ package cn.starnine.sxuinfo;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import cn.starnine.sxuinfo.utils.Analysis;
+import cn.starnine.sxuinfo.utils.DetailAnalysis;
 import cn.starnine.sxuinfo.utils.MyStringRequest;
 
 public class DetailActivity extends BaseActivity implements MyStringRequest.MyResponse {
@@ -40,18 +28,19 @@ public class DetailActivity extends BaseActivity implements MyStringRequest.MyRe
     private RequestQueue queue;
 
     @Override
-    public void beforeSetView() {
+    public boolean beforeSetView() {
         title = getIntent().getStringExtra("title");
         href = getIntent().getStringExtra("href");
         if (title == null || title.equals("") || href == null || href.equals("")) {
             finish();
-            return;
+            return false;
         }
         sp = getSharedPreferences("config", Context.MODE_PRIVATE);
         if (sp.getString("cookie", "").equals("")) {
             finish();
-            return;
+            return false;
         }
+        return super.beforeSetView();
     }
 
     @Override
@@ -70,6 +59,7 @@ public class DetailActivity extends BaseActivity implements MyStringRequest.MyRe
         tv.setText(title);
         dialog = new ProgressDialog(this);
         dialog.setMessage("加载中");
+        dialog.setCancelable(false);
         dialog.show();
         queue = Volley.newRequestQueue(this);
         queue.add(new MyStringRequest(href, this));
@@ -92,7 +82,7 @@ public class DetailActivity extends BaseActivity implements MyStringRequest.MyRe
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    article = (Analysis.Article) msg.obj;
+                    article = (DetailAnalysis.Article) msg.obj;
                     tv_head.setText(article.header);
                     tv_context.setText(article.body);
                     if (dialog != null) dialog.cancel();
@@ -114,7 +104,7 @@ public class DetailActivity extends BaseActivity implements MyStringRequest.MyRe
 
     private List<HashMap<String, String>> getData() {
         List<HashMap<String, String>> list = new ArrayList<>();
-        for (Analysis.Article.Adder a : article.adder) {
+        for (DetailAnalysis.Article.Adder a : article.adder) {
             HashMap<String, String> map = new HashMap<>();
             map.put("name", a.name);
             list.add(map);
@@ -122,13 +112,13 @@ public class DetailActivity extends BaseActivity implements MyStringRequest.MyRe
         return list;
     }
 
-    private Analysis.Article article;
+    private DetailAnalysis.Article article;
 
     @Override
     public void onResponse(final String s) {
         new Thread() {
             public void run() {
-                Analysis.Article article = new Analysis(s).parser();
+                DetailAnalysis.Article article = new DetailAnalysis(s).parser();
                 Message msg = new Message();
                 msg.what = 1;
                 msg.obj = article;

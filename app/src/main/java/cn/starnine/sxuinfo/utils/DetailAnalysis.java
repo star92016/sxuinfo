@@ -8,7 +8,7 @@ import java.util.Vector;
 /**
  * Created by licheng on 16-7-25.
  */
-public class Analysis {
+public class DetailAnalysis {
     public class Item{
         String name="";
         String id="";
@@ -20,7 +20,7 @@ public class Analysis {
     private int len;
     private int state=0;
     private boolean instr=false;
-    public Analysis(String s){
+    public DetailAnalysis(String s){
         this.s=s.toLowerCase();
         len=s.length();
         stack=new Stack<Item>();
@@ -216,7 +216,7 @@ public class Analysis {
                     }else if(ch=='/'){
                         state=11;
                     }else if(ch=='>'){
-                        //TODO push <br>no push...
+
                         if(name.equals("br")){
                             article.body+='\n';
 
@@ -239,7 +239,7 @@ public class Analysis {
                     if(ch==' '||ch=='\n'||ch=='\t'||ch=='\r'){
                         index++;
                     }else if(ch=='>'){
-                        //TODO save <br/>
+
 
                         article.body+='\n';
                         name="";
@@ -252,7 +252,7 @@ public class Analysis {
                     break;
                 case 12:
                     if(ch=='>'){
-                        //TODO pop
+
                         if(name.equals(getcurrent().name)){
 
                             stack.pop();

@@ -4,8 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -27,19 +26,20 @@ import cn.starnine.sxuinfo.utils.MyStringRequest;
 import cn.starnine.sxuinfo.utils.HomeAnalysis;
 import cn.starnine.sxuinfo.utils.HomeAnalysis.*;
 
+
+//TODO 需要退出登录吗
 public class HomeActivity extends BaseActivity implements MyStringRequest.MyResponse,OnParse {
 
-    private SharedPreferences sp;
     private RequestQueue queue;
 
     @Override
-    public void beforeSetView() {
-        super.beforeSetView();
+    public boolean beforeSetView() {
         if (sp.getString("cookie", "").equals("")) {
             finish();
             startActivity(new Intent(this, LoginActivity.class));
-            return;
+            return false;
         }
+        return super.beforeSetView();
     }
 
     @Override
@@ -180,9 +180,13 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
 
     @Override
     public void onGetCookie(String cookie) {
-        //TODO 这里需要每次都保存cookie
+
+        Log.e("AA","savecookie");
         String str = sp.getString("cookie", "");
         if (str.startsWith("JSESSIONID")) {
+            //TODO JSESSIONID可能会失效 尽量重设
+            Log.e("AA","nosavecookie");
+            return;
 
         } else {
             String tmp = cookie;
@@ -202,24 +206,82 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
     public Map<String, String> getParams() {
         return null;
     }
+    public void tryLoginAgain(){
+        Log.e("AA","tryagin");
+        queue.add(new MyStringRequest(MyConfig.LoginUrl, new MyStringRequest.MyResponse() {
+            @Override
+            public void onGetCookie(String cookie) {
+                SharedPreferences.Editor edit = sp.edit();
+                edit.putString("cookie", cookie);
+                edit.apply();
+                queue.add(new MyStringRequest(MyConfig.HomeUrl, HomeActivity.this));
+                Log.e("AA","tryhomeurl");
+            }
 
+            @Override
+            public String onSetCookie() {
+                return null;
+            }
 
+            @Override
+            public Map<String, String> getParams() {
+                String user = sp.getString("user","");
+                String pass = sp.getString("pass","");
+                Map<String, String> hashmap = new HashMap<>();
+                hashmap.put("Login.Token1", user);
+                hashmap.put("Login.Token2", pass);
+                hashmap.put("goto", "http://myportal.sxu.edu.cn/loginSuccess.portal");
+                hashmap.put("gotoOnFail", "http://myportal.sxu.edu.cn/loginFailure.portal");
+                return hashmap;
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                toast("网络错误");
+            }
+
+            @Override
+            public void onResponse(String s) {
+                Log.e("AA","response");
+            }
+        }));
+    }
+private int trytimes=0;
     @Override
     public void onParseError() {
-        //TODO 需要出现几率小
-        if (dialog != null) dialog.cancel();
-        toast("身份过期");
-        finish();
-        startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+        //出现几率小
+
+        if(trytimes>0){
+            if (dialog != null) dialog.cancel();
+            toast("身份过期");
+            finish();
+             startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            return;
+        }
+        trytimes++;
+        tryLoginAgain();
+       // toast("身份过期");
+        //finish();
+       // startActivity(new Intent(HomeActivity.this, LoginActivity.class));
     }
 
     @Override
     public void onErrorResponse(VolleyError volleyError) {
-        //TODO 需要为用户登录一次//当然需要判断是不是真的网断了
+        //TODO 需要判断是不是真的网断了
         if (dialog != null) dialog.cancel();
-        toast("网络错误或身份过期");
-        finish();
-        startActivity(new Intent(this, LoginActivity.class));
+        //if(neterror)
+        if(trytimes>0){
+            if (dialog != null) dialog.cancel();
+            toast("身份过期");
+            finish();
+            startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            return;
+        }
+        trytimes++;
+        tryLoginAgain();
+       //toast("网络错误或身份过期");
+        //finish();
+        //startActivity(new Intent(this, LoginActivity.class));
     }
     @Override
     public void onParseFinished(SXUInfo sxuInfo) {

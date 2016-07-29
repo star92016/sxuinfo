@@ -1,7 +1,6 @@
 package cn.starnine.sxuinfo;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+
 import android.view.View;
 
 //TODO 完成更多页面的解析

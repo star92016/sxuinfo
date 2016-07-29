@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.Response;
 
 /**
  * Created by licheng on 16-7-29.
@@ -18,11 +17,13 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sp = getSharedPreferences("config", Context.MODE_PRIVATE);
-        beforeSetView();
+        if(!beforeSetView())return;
         setContentView();
         initView();
     }
-    public void beforeSetView(){}
+    public boolean beforeSetView(){
+        return true;
+    }
     public abstract void setContentView();
     public abstract void initView();
     private Toast toast;
