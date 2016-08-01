@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -13,6 +16,8 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,6 +27,7 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 import cn.starnine.sxuinfo.data.MyConfig;
+import cn.starnine.sxuinfo.utils.DESTest;
 import cn.starnine.sxuinfo.utils.MyStringRequest;
 import cn.starnine.sxuinfo.utils.HomeAnalysis;
 import cn.starnine.sxuinfo.utils.HomeAnalysis.*;
@@ -31,9 +37,11 @@ import cn.starnine.sxuinfo.utils.HomeAnalysis.*;
 public class HomeActivity extends BaseActivity implements MyStringRequest.MyResponse,OnParse {
 
     private RequestQueue queue;
+    private long exitTime;
 
     @Override
     public boolean beforeSetView() {
+        DESTest.initkey(this);
         if (sp.getString("cookie", "").equals("")) {
             finish();
             startActivity(new Intent(this, LoginActivity.class));
@@ -114,7 +122,7 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
 
             @Override
             public int getChildrenCount(int i) {
-                return sxuinfo.infos.get(i).getAll().size();
+                return sxuinfo.infos.get(i).getAll().size()+1;
             }
 
             @Override
@@ -152,6 +160,10 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
             @Override
             public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
                 View v = LinearLayout.inflate(getApplicationContext(), R.layout.elv_child_home, null);
+                if(i1==getChildrenCount(i)-1){
+                    ((TextView) v.findViewById(R.id.tv_name)).setText("更多");
+
+                }else
                 ((TextView) v.findViewById(R.id.tv_name)).setText(sxuinfo.infos.get(i).getAll().get(i1).getTitle());
                 return v;
             }
@@ -164,10 +176,15 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
         elv_list.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                intent.putExtra("title", sxuinfo.infos.get(i).getAll().get(i1).getTitle());
-                intent.putExtra("href", MyConfig.HomeUrl+"/" + sxuinfo.infos.get(i).getAll().get(i1).getHref());
-                startActivity(intent);
+                if(i1==adapter.getChildrenCount(i)-1){
+                    Intent intent=new Intent(HomeActivity.this,MoreActivity.class);
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+                    intent.putExtra("title", sxuinfo.infos.get(i).getAll().get(i1).getTitle());
+                    intent.putExtra("href", MyConfig.HomeUrl+"/" + sxuinfo.infos.get(i).getAll().get(i1).getHref());
+                    startActivity(intent);
+                }
                 return false;
             }
         });
@@ -207,7 +224,6 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
         return null;
     }
     public void tryLoginAgain(){
-        Log.e("AA","tryagin");
         queue.add(new MyStringRequest(MyConfig.LoginUrl, new MyStringRequest.MyResponse() {
             @Override
             public void onGetCookie(String cookie) {
@@ -215,7 +231,6 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
                 edit.putString("cookie", cookie);
                 edit.apply();
                 queue.add(new MyStringRequest(MyConfig.HomeUrl, HomeActivity.this));
-                Log.e("AA","tryhomeurl");
             }
 
             @Override
@@ -226,7 +241,7 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
             @Override
             public Map<String, String> getParams() {
                 String user = sp.getString("user","");
-                String pass = sp.getString("pass","");
+                String pass = DESTest.decrypt(sp.getString("pass",""));
                 Map<String, String> hashmap = new HashMap<>();
                 hashmap.put("Login.Token1", user);
                 hashmap.put("Login.Token2", pass);
@@ -294,5 +309,46 @@ private int trytimes=0;
         tv_photo.setText(sxuinfo.getPhoto());
         loadphoto();
         loadinfo();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(1,1,1,"退出登录");
+        menu.add(1,2,2,"设置");
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPreferences.Editor editor=sp.edit();
+        switch (item.getItemId()){
+            case 1:
+                editor.putString("pass","");
+                finish();
+                startActivity(new Intent(this,LoginActivity.class));
+                break;
+            case 2:
+                toast("菜单");
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                // 返回键功能的实现
+                exitTime = System.currentTimeMillis();
+                toast("再按一次退出程序");
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
