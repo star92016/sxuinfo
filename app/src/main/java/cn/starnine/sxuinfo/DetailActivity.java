@@ -22,7 +22,6 @@ import cn.starnine.sxuinfo.utils.MyStringRequest;
 
 public class DetailActivity extends BaseActivity implements MyStringRequest.MyResponse {
     private String title, href;
-    private SharedPreferences sp;
     private TextView tv_head;
     private TextView tv_context;
     private RequestQueue queue;

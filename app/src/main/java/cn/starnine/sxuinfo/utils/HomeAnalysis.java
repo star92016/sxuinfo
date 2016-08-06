@@ -5,6 +5,8 @@ import android.os.Message;
 
 import java.util.Vector;
 
+import cn.starnine.sxuinfo.data.MyConfig;
+
 /**
  * Created by licheng on 16-7-29.
  */
@@ -62,14 +64,22 @@ public class HomeAnalysis {
                     if (name.equals("温馨提醒") || name.equals("个人信息")) {
                         continue;
                     }
+                    a=s.indexOf("clipMore",c);
+                    a=s.indexOf("href=",a);
+                    b=s.indexOf("target=",a);
+                    String more=s.substring(a+6,b-1);
                     int end = s.indexOf("portletFrame", c);
-                    Info info =new Info(name);
+                    Info info =new Info(name,more);
 
                     if (end > 0) {
                         b = c;
-                        while ((a = s.indexOf("rss-btn-close", b)) < end) {
-
-                            a = s.indexOf("title=", a);
+                        while ((a = s.indexOf("item-readed clearFix", b)) < end) {
+                            a=s.indexOf("</span>",a);
+                            b=s.indexOf("</span>",a+7);
+                            String time=s.substring(a+7,b);
+                            time=time.replaceAll("&nbsp;","");
+                            time=time.trim();
+                            a = s.indexOf("title=", b);
                             b = s.indexOf("class=", a);
                             String title = s.substring(a + 7, b).trim();
                             title = title.substring(0, title.length() - 1).trim();
@@ -79,13 +89,17 @@ public class HomeAnalysis {
                             href = href.substring(0, href.length() - 1).trim();
                             href = href.replaceAll("&amp;", "&");
                             //Log.v("A",title);
-                            info.add(title, href);
+                            info.add(title, href,time);
                         }
                     } else {
                         b = c;
-                        while ((a = s.indexOf("rss-btn-close", b)) > 0) {
-
-                            a = s.indexOf("title=", a);
+                        while ((a = s.indexOf("item-readed clearFix", b)) > 0) {
+                            a=s.indexOf("</span>",a);
+                            b=s.indexOf("</span>",a+7);
+                            String time=s.substring(a+7,b);
+                            time=time.replaceAll("&nbsp;","");
+                            time=time.trim();
+                            a = s.indexOf("title=", b);
                             b = s.indexOf("class=", a);
                             String title = s.substring(a + 7, b).trim();
                             title = title.substring(0, title.length() - 1).trim();
@@ -94,10 +108,11 @@ public class HomeAnalysis {
                             String href = s.substring(a + 6, b).trim();
                             href = href.substring(0, href.length() - 1).trim();
                             href = href.replaceAll("&amp;", "&");
-                            info.add(title, href);
+                            info.add(title, href,time);
 
                         }
                     }
+
                     sxuinfo.infos.add(info);
                 }
 
@@ -111,11 +126,18 @@ public class HomeAnalysis {
     }
     public static class Info {
         private String name;
+
+        public String getMore() {
+            return more;
+        }
+
+        private String more;
         private Vector<Item> vec;
 
-        public Info(String name) {
+        public Info(String name,String more) {
             vec = new Vector<>();
             this.name = name;
+            this.more= MyConfig.HomeUrl+"/"+more;
         }
 
         public String getName() {
@@ -130,16 +152,24 @@ public class HomeAnalysis {
             return vec.get(id);
         }
 
-        public void add(String title, String href) {
-            vec.add(new Item(title, href));
+        public void add(String title, String href,String time) {
+            vec.add(new Item(title, href,time));
         }
 
         public class Item {
-            private String title, href;
+            private String title;
+            private String href;
 
-            public Item(String title, String href) {
+            public String getTime() {
+                return time;
+            }
+
+            private String time;
+
+            public Item(String title, String href,String time) {
                 this.title = title;
                 this.href = href;
+                this.time=time;
             }
 
             public String getTitle() {

@@ -161,11 +161,12 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
             public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
                 View v = LinearLayout.inflate(getApplicationContext(), R.layout.elv_child_home, null);
                 if(i1==getChildrenCount(i)-1){
-                    ((TextView) v.findViewById(R.id.tv_name)).setText("更多");
-
-                }else
-                ((TextView) v.findViewById(R.id.tv_name)).setText(sxuinfo.infos.get(i).getAll().get(i1).getTitle());
-                return v;
+                    ((TextView) v.findViewById(R.id.tv_name)).setText("更多...");
+                    ((TextView) v.findViewById(R.id.tv_time)).setText("");
+                }else {
+                    ((TextView) v.findViewById(R.id.tv_name)).setText(sxuinfo.infos.get(i).getAll().get(i1).getTitle());
+                    ((TextView) v.findViewById(R.id.tv_time)).setText(sxuinfo.infos.get(i).getAll().get(i1).getTime());
+                }return v;
             }
             @Override
             public boolean isChildSelectable(int i, int i1) {
@@ -178,6 +179,8 @@ public class HomeActivity extends BaseActivity implements MyStringRequest.MyResp
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
                 if(i1==adapter.getChildrenCount(i)-1){
                     Intent intent=new Intent(HomeActivity.this,MoreActivity.class);
+                    intent.putExtra("href",sxuinfo.infos.get(i).getMore());
+                    intent.putExtra("title","更多 "+sxuinfo.infos.get(i).getName());
                     startActivity(intent);
                 }else{
                     Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
