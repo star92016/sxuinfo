@@ -1,5 +1,7 @@
 package cn.starnine.sxuinfo.net.http;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,6 +25,7 @@ public class HttpRequest {
 		public void onLoadFinish(String html){}
 		public void onDownLoadFinish(){}
 		public void onDownLoadProcess(int process){}
+		public void onError(int code,String msg){}
 	}
 	private URL url;
 	private String method="GET";
@@ -121,12 +124,15 @@ public class HttpRequest {
 		if(url.getPort()>0)
 			port=url.getPort();
 		try {
+			Log.d(this.getClass().getName(),url.getHost()+port);
 			socket=new Socket(url.getHost(),port);
+			Log.d(this.getClass().getName(),"1");
 			if(!url.getProtocol().equals("http"))
 				throw new Exception("Not Http Protocol");
 			if(!(method.equals("GET")||method.equals("POST"))){
 				throw new Exception("Wrong Method");
 			}
+			Log.d(this.getClass().getName(),"2");
 			PrintStream printstream=new PrintStream(socket.getOutputStream());
 			StringBuilder bulider = new StringBuilder();
 			String getPos="/";
@@ -320,18 +326,19 @@ public class HttpRequest {
 		} catch (IOException e) {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
+			onHttpRequest.onError(1,e.getMessage());
 		} catch(Exception e){
 			e.printStackTrace();
+			onHttpRequest.onError(2,e.getMessage());
 		}finally{
 			try {
-				socket.close();
+				if(socket!=null)
+					socket.close();
 			} catch (IOException e) {
 				// TODO 自动生成的 catch 块
 				e.printStackTrace();
+				onHttpRequest.onError(3,e.getMessage());
 			}
 		}
-	}
-	public static void main(String[] args) {
-		
 	}
 }
