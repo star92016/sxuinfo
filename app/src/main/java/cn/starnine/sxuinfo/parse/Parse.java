@@ -9,10 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.starnine.sxuinfo.bean.DetailInfo;
-import cn.starnine.sxuinfo.bean.MainInfo;
-import cn.starnine.sxuinfo.bean.MoreInfo;
-
 
 public class Parse {
 	public static final String index = "c:\\Users\\licheng\\Desktop\\sxuinfo\\index.html";
