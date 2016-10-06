@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DetailInfo implements Serializable{
+
+
 	public static class FileInfo implements Serializable{
 		private String name;
 		private URL url;
@@ -41,8 +43,9 @@ public class DetailInfo implements Serializable{
 		fileInfos.add(new FileInfo(name,url));
 	}
 	
-	public DetailInfo(String title, String time, String who, String depart,
+	public DetailInfo(URL url,String title, String time, String who, String depart,
 			int readTimes, String content) {
+		this.url=url;
 		this.title = title;
 		this.time = time;
 		this.who = who;
@@ -58,4 +61,5 @@ public class DetailInfo implements Serializable{
 	private int readTimes;
 	private String content;
 	private List<FileInfo> fileInfos=new ArrayList<DetailInfo.FileInfo>();
+	private URL url;
 }	

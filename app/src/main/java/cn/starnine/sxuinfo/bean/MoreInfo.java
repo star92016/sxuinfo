@@ -17,6 +17,10 @@ public class MoreInfo implements Serializable{
 	private String pagebefore;
 	private String pageafter;
 	private Map<String,URL> group=new LinkedHashMap<String,URL>();
+	private URL url;
+	public MoreInfo(URL url){
+		this.url=url;
+	}
 	public void initPage(int totalpages,int totalrecords,int currentpages,String url){
 		this.totalpages=totalpages;
 		this.totalrecords=totalrecords;
@@ -43,4 +47,5 @@ public class MoreInfo implements Serializable{
 			e.printStackTrace();
 		}
 	}
+
 }

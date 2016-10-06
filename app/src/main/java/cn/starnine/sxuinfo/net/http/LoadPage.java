@@ -23,7 +23,7 @@ public class LoadPage {
     public LoadPage(Context context){
         this.context=context;
     }
-    public void request(final String url, final OnLoadPage onLoadPage){
+    private void request(final String url, final OnLoadPage onLoadPage){
         try {
             URL url1=new URL(url);
             request(url1,onLoadPage);
@@ -33,7 +33,13 @@ public class LoadPage {
         }
 
     }
-    public void request(final URL url, final OnLoadPage onLoadPage){
+    public void addRequest(final String url, final OnLoadPage onLoadPage){
+        new LoadPage(context).request(url,onLoadPage);
+    }
+    public void addRequest(final URL url, final OnLoadPage onLoadPage){
+        new LoadPage(context).request(url,onLoadPage);
+    }
+    private void request(final URL url, final OnLoadPage onLoadPage){
         count++;
         if(count>2)
             onLoadPage.onNetError();

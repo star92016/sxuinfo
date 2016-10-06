@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class Parse {
 
 	public static void main(String[] args) {
 		String str = new Parse().getFromFile(detail);
-		print(Parse.buildDetailInfo(str,null).toString());
+		print(Parse.buildDetailInfo(null,str,null).toString());
 		//print(buildMoreInfo(str).toString());
 	}
 
@@ -46,7 +47,7 @@ public class Parse {
 			try {
 				mainInfo.addMore(m.group(2).trim());
 			} catch (Exception e) {
-				// TODO 自动生成的 catch 块
+
 				e.printStackTrace();
 			}
 		}
@@ -59,14 +60,14 @@ public class Parse {
 						m.group(2).replaceAll("(&nbsp;|\\s)", ""), m.group(6),
 						m.start());
 			} catch (Exception e) {
-				// TODO 自动生成的 catch 块
+
 				e.printStackTrace();
 			}
 		}
 		return mainInfo;
 	}
 
-	public static DetailInfo buildDetailInfo(String str, Map<String,String> map){
+	public static DetailInfo buildDetailInfo(URL url,String str, Map<String,String> map){
 		DetailInfo detailInfo=null;
 		str=str.replaceAll("<!--(\\w|\\W)*?-->", "");
 		str=str.replaceAll("<script(\\w|\\W)*?</script>", "");
@@ -103,7 +104,7 @@ public class Parse {
 				}
 			}
 		}
-		detailInfo=new DetailInfo(title, time, who, depart, reads, content);
+		detailInfo=new DetailInfo(url,title, time, who, depart, reads, content);
 		p = Pattern
 				.compile("<div class=\"bulletin-info\">((\\d|\\D)+?)(<span|</table)");
 		m = p.matcher(str);
@@ -127,8 +128,8 @@ public class Parse {
 		detailInfo.setContent(str,map);
 		return detailInfo;
 	}
-	public static MoreInfo buildMoreInfo(String str) {
-		MoreInfo moreInfo = new MoreInfo();
+	public static MoreInfo buildMoreInfo(URL url,String str) {
+		MoreInfo moreInfo = new MoreInfo(url);
 		Pattern p = Pattern
 				.compile("<span class=\"rss-time\">(\\w|\\W)+?>(.+?)</span>(\\w|\\W)+?>(.+?)</span>(\\w|\\W)+?<a class=\"rss-title\"(\\w|\\W)+?href=\"(.+?)\"(\\w|\\W)+?>(.+?)</a>");
 		Matcher m = p.matcher(str);
@@ -174,16 +175,16 @@ public class Parse {
 				builder.append("\n");
 			}
 		} catch (FileNotFoundException e) {
-			// TODO 自动生成的 catch 块
+
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
+
 			e.printStackTrace();
 		} finally {
 			try {
 				br.close();
 			} catch (IOException e) {
-				// TODO 自动生成的 catch 块
+
 				e.printStackTrace();
 			}
 		}

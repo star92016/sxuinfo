@@ -324,7 +324,7 @@ public class HttpRequest {
 			printstream.close();
 			is.close();
 		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
+
 			e.printStackTrace();
 			onHttpRequest.onError(1,e.getMessage());
 		} catch(Exception e){
@@ -335,7 +335,7 @@ public class HttpRequest {
 				if(socket!=null)
 					socket.close();
 			} catch (IOException e) {
-				// TODO 自动生成的 catch 块
+
 				e.printStackTrace();
 				onHttpRequest.onError(3,e.getMessage());
 			}

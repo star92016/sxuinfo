@@ -2,17 +2,16 @@ package cn.starnine.sxuinfo;
 
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.Serializable;
 
-import cn.starnine.sxuinfo.net.http.HttpClient;
 import cn.starnine.sxuinfo.net.http.LoadPage;
+import cn.starnine.sxuinfo.parse.buildBean;
 
 public class HomeActivity extends AppCompatActivity{
     @Override
@@ -23,24 +22,29 @@ public class HomeActivity extends AppCompatActivity{
         init();
     }
 TextView tv1;
-
+    Toast toast;
+    public void toast(String msg){
+        if(toast==null)
+            toast=Toast.makeText(this,"",Toast.LENGTH_LONG);
+        toast.setText(msg);
+        toast.show();
+    }
     private void init() {
         tv1=(TextView)findViewById(R.id.tv_1);
-        LoadPage l=new LoadPage(this);
-        l.request(User.INDEX, new LoadPage.OnLoadPage() {
+        new buildBean(this).buildMainInfo(new buildBean.OnBuildBean() {
             @Override
-            public void onNetError() {
-
-            }
-
-            @Override
-            public void onFinish(String html) {
-                tv1.setText(html);
+            public void onNoNetWork() {
+                toast("onnet");
             }
 
             @Override
             public void onNeedLogin() {
+                toast("needlogin");
+            }
 
+            @Override
+            public void onOk(Serializable s) {
+                toast(s.toString());
             }
         });
     }

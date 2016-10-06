@@ -34,7 +34,6 @@ public class HttpClient {
 		try {
 			h.init(new URL("http://myportal.sxu.edu.cn/destroySSOToken.portal?goto=http%3A%2F%2Fmyportal.sxu.edu.cn%2Findex.portal"), "GET",null);
 		} catch (MalformedURLException e) {
-			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
 		//h.setFile(new File("d:\\"));

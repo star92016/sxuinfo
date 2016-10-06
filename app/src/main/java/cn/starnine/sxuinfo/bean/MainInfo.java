@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainInfo implements Serializable{
+	public static String toUnique(URL url){
+		return "MainInfo";
+	}
+
 	public static class BlockInfo implements Serializable{
 		private String title;
 		private List<ItemInfo> itemInfos = new ArrayList<ItemInfo>();

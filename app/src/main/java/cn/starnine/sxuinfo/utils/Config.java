@@ -3,6 +3,7 @@ package cn.starnine.sxuinfo.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -18,11 +19,21 @@ public class Config {
     }
     private static SharedPreferences cookie;
     private static SharedPreferences user;
+
     public static String getUserName(){
         return user.getString("user","");
     }
     public static String getPassWd(){
         return user.getString("pass","");
+    }
+
+    public static long getOutCacheTime(){
+        return user.getLong("outcache",1000*60*20);
+    }
+    public static void setOutCacheTime(long time){
+        SharedPreferences.Editor editor=Config.user.edit();
+        editor.putLong("outcache",time);
+        editor.apply();
     }
     public static void SetUserPass(String user,String pass){
         SharedPreferences.Editor editor=Config.user.edit();

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import cn.starnine.sxuinfo.parse.buildBean;
 import cn.starnine.sxuinfo.utils.Config;
 
 /**
@@ -20,6 +21,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         Config.init(getApplicationContext());
+        User.init(getApplicationContext());
         init();
     }
     private EditText user,pass;
@@ -29,6 +31,10 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.button3).setOnClickListener(this);
         user= (EditText) findViewById(R.id.editText2);
         pass=(EditText)findViewById(R.id.editText);
+        if(new buildBean(this).isNetAvailable())
+            toast("No Net");
+        else
+            toast("Net");
     }
     Toast toast;
 public void toast(String msg){
