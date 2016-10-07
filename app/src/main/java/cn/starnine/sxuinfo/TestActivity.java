@@ -1,8 +1,9 @@
 package cn.starnine.sxuinfo;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,9 +33,9 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         user= (EditText) findViewById(R.id.editText2);
         pass=(EditText)findViewById(R.id.editText);
         if(new buildBean(this).isNetAvailable())
-            toast("No Net");
+            toast("网络正常");
         else
-            toast("Net");
+            toast("没有网络");
     }
     Toast toast;
 public void toast(String msg){

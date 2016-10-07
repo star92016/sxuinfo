@@ -23,6 +23,22 @@ public class ItemInfo implements Serializable{
 		this.depart = depart;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public String getDepart() {
+		return depart;
+	}
+
+	public URL getUrl() {
+		return url;
+	}
+
 	public String toString() {
 		return "title:" + title + "\ntime:" + time + "\ndepart:" + depart
 				+ "\nurl:" + url + "\nisread:" + isRead;

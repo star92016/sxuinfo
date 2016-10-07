@@ -14,11 +14,28 @@ public class MainInfo implements Serializable{
 		private String title;
 		private List<ItemInfo> itemInfos = new ArrayList<ItemInfo>();
 
+		public String getTitle() {
+			return title;
+		}
+
 		public String toString() {
 			//return "title:"+title+"size:"+itemInfos.size()+"more:"+moreUrl;
 			return "title:" + title + "\n" + itemInfos.toString()+"\nclipMore:"+moreUrl;
 		}
-
+		public String[] toStrings(){
+			String[] strs=new String[itemInfos.size()+1];
+			for (int i=0;i<itemInfos.size();i++){
+				strs[i]=itemInfos.get(i).getTitle()+"("+itemInfos.get(i).getTime()+")";
+			}
+			strs[strs.length-1]="更多...";
+			return strs;
+		}
+		public int size(){
+			return itemInfos.size();
+		}
+		public ItemInfo get(int i){
+			return itemInfos.get(i);
+		}
 		private int pos;
 
 		public BlockInfo(String title, int pos) {
@@ -26,6 +43,20 @@ public class MainInfo implements Serializable{
 			this.pos = pos;
 		}
 		private URL moreUrl;
+
+		public URL getMoreUrl() {
+			return moreUrl;
+		}
+	}
+	public String[] toBlockStr(){
+		String[] strings=new String[blockInfos.size()];
+		for (int i=0;i<blockInfos.size();i++){
+			strings[i]=blockInfos.get(i).title;
+		}
+		return strings;
+	}
+	public BlockInfo get(int i){
+		return blockInfos.get(i);
 	}
 
 	private List<BlockInfo> blockInfos = new ArrayList<MainInfo.BlockInfo>();

@@ -1,30 +1,31 @@
 package cn.starnine.sxuinfo;
 
-
-import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import java.io.Serializable;
-import cn.starnine.sxuinfo.bean.MainInfo;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import cn.starnine.sxuinfo.bean.MoreInfo;
 import cn.starnine.sxuinfo.parse.buildBean;
 
-public class HomeActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+public class MoreItemActivity extends AppCompatActivity {
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_more_item);
         init();
     }
-;
+    private String title;
+    private URL url;
     Toast toast;
     public void toast(String msg){
         if(toast==null)
@@ -32,11 +33,18 @@ public class HomeActivity extends AppCompatActivity {
         toast.setText(msg);
         toast.show();
     }
-    private ListView listView;
+    private MoreInfo moreInfo;
+    private ListView lv_1;
     private void init() {
-        listView=(ListView)findViewById(R.id.lv_1);
-
-        new buildBean(this).buildMainInfo(new buildBean.OnBuildBean() {
+        title=getIntent().getStringExtra("title");
+        setTitle(title);
+        lv_1=(ListView)findViewById(R.id.lv_1);
+        try {
+            url=new URL(getIntent().getStringExtra("url"));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        new buildBean(this).buildMoreInfo(url, new buildBean.OnBuildBean() {
             @Override
             public void onNoNetWork() {
                 toast("没有网络");
@@ -49,17 +57,15 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onOk(Serializable s) {
-                final MainInfo mainInfo=(MainInfo)s;
-                String strs[]=mainInfo.toBlockStr();
+                moreInfo=(MoreInfo)s;
                 findViewById(R.id.tv_load).setVisibility(View.GONE);
-                listView.setAdapter(new ArrayAdapter<String>(HomeActivity.this,android.R.layout.simple_list_item_1,strs));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                lv_1.setAdapter(new ArrayAdapter<String>(MoreItemActivity.this,android.R.layout.simple_list_item_1,moreInfo.toStrings()));
+                lv_1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        //toast(mainInfo.get(position).toString());
-                        Intent intent=new Intent(HomeActivity.this,MainItemActivity.class);
+                        Intent intent=new Intent(MoreItemActivity.this,DetailActivity.class);
                         Bundle bundle=new Bundle();
-                        bundle.putSerializable("block",mainInfo.get(position));
+                        bundle.putSerializable("item",moreInfo.get(position));
                         intent.putExtras(bundle);
                         startActivity(intent);
                     }
@@ -68,7 +74,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onError(String msg) {
-                toast("错误："+msg);
+                toast("错误:"+msg);
             }
         });
     }

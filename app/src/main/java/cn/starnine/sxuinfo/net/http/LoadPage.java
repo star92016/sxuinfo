@@ -66,7 +66,6 @@ public class LoadPage {
                             onLoadPage.onNetError();
                         }
                     });
-                    onLoadPage.onNeedLogin();
                 }else{
                     int s,e;
                     s=html.indexOf("<");

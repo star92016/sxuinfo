@@ -29,6 +29,10 @@ public class DetailInfo implements Serializable{
 				+ ", content=" + content + ", fileInfos=" + fileInfos + "]";
 	}
 	public void setContent(String content,Map<String,String> map){
+		if (map!=null)
+			for(String key:map.keySet()){
+				content=content.replaceAll(key,map.get(key));
+			}
 		this.content=content;
 	}
 	public void replaceWith(Map<String,String> map){
@@ -62,4 +66,29 @@ public class DetailInfo implements Serializable{
 	private String content;
 	private List<FileInfo> fileInfos=new ArrayList<DetailInfo.FileInfo>();
 	private URL url;
-}	
+
+	public String getContent() {
+		return content;
+	}
+
+	public String getHead() {
+		return "部门："+depart+" 发布时间："+time+" 阅读人数："+readTimes;
+	}
+	public static String toUnique(URL url){
+		String str=url.toString();
+		StringBuilder builder=new StringBuilder();
+		str=str.split("\\?")[1];
+		String[] array=str.split("&");
+		for (String s:array){
+			String []s1=s.split("=");
+			if (s1.length!=2)throw new RuntimeException("Wrong Url");
+			if (s1[0].equals(".pen"))
+				builder.append(s1[1]);
+			else if(s1[0].equals("bulletinId")){
+				s1[1]=s1[1].replaceAll("-","");
+				builder.append(s1[1]);
+			}
+		}
+		return builder.toString();
+	}
+}

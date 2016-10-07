@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 import cn.starnine.sxuinfo.bean.DetailInfo;
 import cn.starnine.sxuinfo.bean.MainInfo;
 import cn.starnine.sxuinfo.bean.MoreInfo;
+import cn.starnine.sxuinfo.utils.Config;
 
 
 public class Parse {
@@ -30,13 +32,33 @@ public class Parse {
 		System.out.println(str);
 	}
 
-	public static MainInfo buildMainInfo(String str) {
+
+	/**
+	 * 构建MainInfo,DetailInfo,MoreInfo的通用接口
+	 * */
+	public static Serializable buildBean(URL url,String str,Class cls){
+		String clsname=cls.getSimpleName();
+		if (clsname.equals("MainInfo")){
+			return buildMainInfo(str);
+		}else if (clsname.equals("DetailInfo")){
+			return buildDetailInfo(url,str, Config.getDetailRe());
+		}else if (clsname.equals("MoreInfo")){
+			return buildMoreInfo(url,str);
+		}else {
+			throw new RuntimeException("Call buildBean Wrong");
+		}
+	}
+
+	private static MainInfo buildMainInfo(String str) {
 		Pattern p = Pattern
 				.compile("<div\\sclass=\"portlet\"(\\w|\\W)+?<span>(.+?)</span>");
+		str=str.replaceAll("<!--(\\w|\\W)*?-->", "");
+		str=str.replaceAll("<script(\\w|\\W)*?</script>", "");
 		Matcher m = p.matcher(str);
 		MainInfo mainInfo = new MainInfo();
 		while (m.find()) {
-			if (m.group(2).equals("个人信息") || m.group(2).equals("温馨提醒"))
+			if (m.group(2).equals("个人信息") || m.group(2).equals("温馨提醒")||
+					m.group(2).equals("配置"))
 				continue;
 			mainInfo.addBlock(m.group(2), m.start(2));
 		}
@@ -67,7 +89,7 @@ public class Parse {
 		return mainInfo;
 	}
 
-	public static DetailInfo buildDetailInfo(URL url,String str, Map<String,String> map){
+	private static DetailInfo buildDetailInfo(URL url,String str, Map<String,String> map){
 		DetailInfo detailInfo=null;
 		str=str.replaceAll("<!--(\\w|\\W)*?-->", "");
 		str=str.replaceAll("<script(\\w|\\W)*?</script>", "");
@@ -128,8 +150,10 @@ public class Parse {
 		detailInfo.setContent(str,map);
 		return detailInfo;
 	}
-	public static MoreInfo buildMoreInfo(URL url,String str) {
+	private static MoreInfo buildMoreInfo(URL url,String str) {
 		MoreInfo moreInfo = new MoreInfo(url);
+		str=str.replaceAll("<!--(\\w|\\W)*?-->", "");
+		str=str.replaceAll("<script(\\w|\\W)*?</script>", "");
 		Pattern p = Pattern
 				.compile("<span class=\"rss-time\">(\\w|\\W)+?>(.+?)</span>(\\w|\\W)+?>(.+?)</span>(\\w|\\W)+?<a class=\"rss-title\"(\\w|\\W)+?href=\"(.+?)\"(\\w|\\W)+?>(.+?)</a>");
 		Matcher m = p.matcher(str);
@@ -162,7 +186,9 @@ public class Parse {
 		}
 		return moreInfo;
 	}
-
+	/**
+	 * 测试方法
+	 * */
 	public String getFromFile(String file) {
 		StringBuilder builder = new StringBuilder();
 		BufferedReader br = null;
